@@ -4,8 +4,7 @@
 const char error[65] = "The two input lists should be the same size when they are not.\n"; // defines the constant error mesage
 
 typedef struct { // defines a neuron
-    node * prevact;
-    node * wgt;
+    node * wgt = newList();
     double bias;
     double act;
     int out;
@@ -48,9 +47,12 @@ double ReLU (double in, int der){
 }
 
 double LeakyReLU (double in, double a, int der){
-    if (der == 1){
+    if (der == 1){ // ∂/∂in
         if (in <= 0) return a;
         if (in > 0) return 1;
+    } else if (der == 2){ // ∂/∂a
+        if (in <= 0) return in;
+        if (in > 0) return 0;
     } else {
         if (in <= 0) return in * a;
         if (in > 0) return in;
@@ -66,28 +68,31 @@ double SiLU (double in, int der){
 }
 
 double ELU (double in, double a, int der){
-    if (der == 1){
+    if (der == 1){ // ∂/∂in
         if (in <= 0) return a * exp(in);
         if (in > 0) return 1;
+    } else if (der == 2){ // ∂/∂a
+        if (in <= 0) return exp(in) - 1;
+        if (in > 0) return 0;
     } else {
         if (in <= 0) return a * (exp(in) - 1);
         if (in > 0) return in;
     }
 }
 
-double middlelayer (double in){
-    return LeakyReLU(in, .1, 0);
+double middlelayer (double in, double a){
+    return LeakyReLU(in, a, 0);
 }
 
-double outlayer (double in){
+double outlayer (double in, double a){
     return normhyptan(in, 0);
 }
 
-double derivative (double in, int output){ // derivitives of the scaling functions
+double derivative (double in, int output, double a = .1){ // derivitives of the scaling functions
     if (output) {
         return normhyptan(in, 1);
     } else {
-        return LeakyReLU(in, .1, 1);
+        return LeakyReLU(in, a, 1);
     }
 }
 
@@ -105,14 +110,14 @@ double calc_z (node * act, node * wgt, double bias){ // calculates what the outp
     return a + bias;
 }
 
-double calc_act (node * act, node * wgt, double bias, int output){ // calculates what the output of one neuron should be
+double calc_act (node * act, node * wgt, double bias, int output, double a = .1){ // calculates what the output of one neuron should be
     if (len(act) != len(wgt)){
         printf(error);
         return NAN;
     }
 
-    if (!output) return middlelayer(calc_z(act, wgt, bias));
-    if (output) return outlayer(calc_z(act, wgt, bias));
+    if (!output) return middlelayer(calc_z(act, wgt, bias), a);
+    if (output) return outlayer(calc_z(act, wgt, bias), a);
 }
 
 double cost (double wanted, double given){ // calculates how bad the machine performes    
