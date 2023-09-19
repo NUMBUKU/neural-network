@@ -1,6 +1,7 @@
 # neural-network
 a library for making neural networks
 
+# info
 This library was written in C++ by me, NUMBUKU, and depends heavily on two other C libraries I wrote.
 It also uses some standard libraries: stdio, stdlib, math and iostream. This particular
 file is for defining a neural network and the neuron.h file is for defining a neuron and some methods
@@ -11,6 +12,7 @@ so you can understand what the library is actually doing. I also want to say tha
 programmer and that most of the things I wrote here might be horribly inefficient, so if you find any
 flaws, please notify me and I will try to fix them.
 
+# how to use
 The library works as the following. To define a new neural network use: 
 "neural_net 'the name of your net'(number of collumns, number of rows, number of inputs, number of outputs);".
 To calculate the output use: "'the name of your net'.calc_out(the list of inputs);". To calculate how bad
