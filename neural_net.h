@@ -31,13 +31,13 @@ class neural_net {
         bool printnet;
 
         unsigned long iteration = 0;
-        node ** middle;
+        double coef;
 
         // recursive method for changing the previous activation
         void change_previous (int collumn, double avia, double share){
             node * impact = newList();
             for (int y = 0; y < neural_net::rows; y++){
-                impact = calc_impact(middle[collumn-1], neural_net::net[collumn, y].wgt, neural_net::net[collumn, y].bias, neural_net::net[collumn, y].act + avia, neural_net::net[collumn, y].out);
+                impact = calc_impact(middle[collumn-1], neural_net::net[collumn, y].wgt, neural_net::net[collumn, y].bias, neural_net::net[collumn, y].act + avia, neural_net::net[collumn, y].out, neural_net::coef);
                 double avib = atIndex(impact, 0);
                 double aviw = atIndex(impact, 1);
                 double avia1 = atIndex(impact, 2);
@@ -59,13 +59,14 @@ class neural_net {
         node * outl = newList();
         double out, certainty;
         unsigned int col, inputs, outputs, rows;
+        node ** middle;
 
         // public variables for the neurons
         neuron * net;
         neuron * outn;
 
         //constructor
-        neural_net (unsigned int collums, unsigned int rows, unsigned int outputs, unsigned int inputs, bool printnet_after_death, double coef = .1){
+        neural_net (unsigned int collums, unsigned int rows, unsigned int outputs, unsigned int inputs, bool printnet_after_death = false, double coef = .1){
             if (collums == 0 || rows == 0 || outputs == 0 || inputs == 0){
                 throw std::runtime_error("Invalid parameter, the parameters must be greater than zero.");
             } else {
@@ -73,6 +74,7 @@ class neural_net {
                 neural_net::rows = rows;
                 neural_net::outputs = outputs;
                 neural_net::inputs = inputs;
+                neural_net::coef = coef;
                 neural_net::net = new neuron [neural_net::col, neural_net::rows];
                 neural_net::outn = new neuron [outputs];
                 neural_net::middle = new node * [neural_net::col];
@@ -116,7 +118,7 @@ class neural_net {
                         for (int c = 0; c < len(neural_net::net[x, y].wgt); c++){
                             std::cout << "changeAtIndex(name.net[" << x << ", " << y << "].wgt, " << c << ", " << atIndex(neural_net::net[x, y].wgt, c) << ");" << std::endl;
                         }
-                        del(neural_net::net[x, y].wgt);
+                        delete (neural_net::net[x, y].wgt);
                     }
                 }
                 for (int i = 0; i < neural_net::outputs; i++){
@@ -128,15 +130,15 @@ class neural_net {
             } else {
                 for (int x = 0; x < neural_net::col; x++){            
                     for (int y = 0; y < neural_net::rows; y++){
-                        del(neural_net::net[x, y].wgt);
+                        delete (neural_net::net[x, y].wgt);
                     }
                 }
             }
 
             for (int n = 0; n < neural_net::col; n++){
-                del(middle[n]);
+                delete (middle[n]);
             }
-            del(neural_net::outl);
+            delete (neural_net::outl);
             delete (neural_net::middle);
             delete (neural_net::net);
             delete (neural_net::outn);
@@ -146,15 +148,14 @@ class neural_net {
         //public methods
         double calc_out (node * input){ // method for calculating the output, stores the list of outputs in neural_net::outl and stores the highest number in that list in neural_net::out
             outl = clear(outl);
-
             for (int l = 0; l < neural_net::col; l++){
                middle[l] = clear(middle[l]);
             }
 
             for (int i = 0; i < neural_net::col+1; i++){
-                if (i == 0){
+                if (i == 0){ // first layer
                     for (int j = 0; j < neural_net::rows; j++){
-                        neural_net::net[0, j].act = calc_act(input, neural_net::net[0, j].wgt, neural_net::net[0, j].bias, neural_net::net[0, j].out);
+                        neural_net::net[0, j].act = calc_act(input, neural_net::net[0, j].wgt, neural_net::net[0, j].bias, 0, neural_net::coef);
                         if (neural_net::iteration == 0){
                             app(middle[0], neural_net::net[0, j].act);
                         } else {
@@ -163,7 +164,7 @@ class neural_net {
                     }
                 } else if (i == neural_net::col){ // last layer
                     for (int j = 0; j < neural_net::outputs; j++){
-                        neural_net::outn[j].act = calc_act(neural_net::middle[neural_net::col-1], neural_net::outn[j].wgt, neural_net::outn[j].bias, neural_net::outn[j].out);
+                        neural_net::outn[j].act = calc_act(neural_net::middle[neural_net::col-1], neural_net::outn[j].wgt, neural_net::outn[j].bias, 1, neural_net::coef);
                         if (neural_net::iteration == 0){
                             app(neural_net::outl, neural_net::outn[j].act);
                         } else {
@@ -172,11 +173,11 @@ class neural_net {
                     }
 
                     neural_net::out = indexOf(neural_net::outl, max(neural_net::outl));
-                    neural_net::certainty = 100 * atIndex(neural_net::outl, neural_net::out) / total(neural_net::outl);
+                    neural_net::certainty = round((atIndex(neural_net::outl, neural_net::out) / total(neural_net::outl)) * atIndex(neural_net::outl, neural_net::out) * 1000)/10;
                     return neural_net::out;
                 } else { // middle layers
                     for (int j = 0; j < neural_net::rows; j++){
-                        neural_net::net[i, j].act = calc_act(neural_net::middle[i-1], neural_net::net[i, j].wgt, neural_net::net[i, j].bias, neural_net::net[i, j].out);
+                        neural_net::net[i, j].act = calc_act(neural_net::middle[i-1], neural_net::net[i, j].wgt, neural_net::net[i, j].bias, neural_net::net[i, j].out, neural_net::coef);
                         if (neural_net::iteration == 0){
                             app(middle[i], neural_net::net[i, j].act);
                         } else {
@@ -207,7 +208,7 @@ class neural_net {
             }
 
             for (int n = 0; n < outputs; n++){
-                node * impact = calc_impact(neural_net::middle[n-1], neural_net::outn[n].wgt, neural_net::outn[n].bias, atIndex(wanted, n), neural_net::outn[n].out);
+                node * impact = calc_impact(neural_net::middle[neural_net::col-1], neural_net::outn[n].wgt, neural_net::outn[n].bias, atIndex(wanted, n), neural_net::outn[n].out, neural_net::coef);
                 double avib = atIndex(impact, 0);
                 double aviw = atIndex(impact, 1);
                 double avia = atIndex(impact, 2);

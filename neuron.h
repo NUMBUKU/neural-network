@@ -3,8 +3,8 @@
 
 const char error[65] = "The two input lists should be the same size when they are not.\n"; // defines the constant error mesage
 
-typedef struct { // defines a neuron
-    node * wgt = newList();
+typedef struct n_t { // defines a neuron
+    node * wgt;
     double bias;
     double act;
     int out;
@@ -22,9 +22,9 @@ double hyptan (double in, int der){ // scaling function from -1 to 1
 
 double normhyptan (double in, int der){ // scaling function from 0 to 1
     if (der == 1){
-        return (tanh(in)+1)/2;
-    } else {
         return 1/(pow(cosh(in), 2.00));
+    } else {
+        return (tanh(in)+1)/2;
     }
 }
 
@@ -102,7 +102,7 @@ double calc_z (node * act, node * wgt, double bias){ // calculates what the outp
         return NAN;
     }
 
-    double a;
+    double a = 0;
     for (int i = 0; i < len(act); i++){
         a += atIndex(act, i) * atIndex(wgt, i);
     }
@@ -110,7 +110,7 @@ double calc_z (node * act, node * wgt, double bias){ // calculates what the outp
     return a + bias;
 }
 
-double calc_act (node * act, node * wgt, double bias, int output, double a = .1){ // calculates what the output of one neuron should be
+double calc_act (node * act, node * wgt, double bias, int output, double a){ // calculates what the output of one neuron should be
     if (len(act) != len(wgt)){
         printf(error);
         return NAN;
@@ -124,7 +124,7 @@ double cost (double wanted, double given){ // calculates how bad the machine per
     return pow(given - wanted, 2.00);
 }
 
-node * calc_impact (node * act, node * wgt, double bias, double wanted, int output){ // returns a list to indicate which variable has the most impact on the cost and how much it should change
+node * calc_impact (node * act, node * wgt, double bias, double wanted, int output, double coef){ // returns a list to indicate which variable has the most impact on the cost and how much it should change
     if (len(act) != len(wgt)){
         printf(error);
         node * err = NULL;
@@ -134,19 +134,19 @@ node * calc_impact (node * act, node * wgt, double bias, double wanted, int outp
     double a;
     node * impact_wgt = newList(); 
     for (int i = 0; i < len(act); i++){ //calculating the impact of the weights
-        a = 2 * (calc_act(act, wgt, bias, output) - wanted) * derivative(calc_z(act, wgt, bias), output) * atIndex(act, i);
+        a = 2 * (calc_act(act, wgt, bias, output, coef) - wanted) * derivative(calc_z(act, wgt, bias), output) * atIndex(act, i);
         app(impact_wgt, a);
     }
 
     node * impact_bias = newList(); 
     for (int j = 0; j < len(act); j++){ //calculating the impact of the biases
-        a = 2 * (calc_act(act, wgt, bias, output) - wanted) * derivative(calc_z(act, wgt, bias), output);
+        a = 2 * (calc_act(act, wgt, bias, output, coef) - wanted) * derivative(calc_z(act, wgt, bias), output);
         app(impact_bias, a);
     }
 
     node * impact_act = newList();
     for (int k = 0; k < len(act); k++){ //calculating the impact of the previous activations
-        a = 2 * (calc_act(act, wgt, bias, output) - wanted) * derivative(calc_z(act, wgt, bias), output) * atIndex(wgt, k);
+        a = 2 * (calc_act(act, wgt, bias, output, coef) - wanted) * derivative(calc_z(act, wgt, bias), output) * atIndex(wgt, k);
         app(impact_act, a);
     }
 
