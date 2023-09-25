@@ -30,7 +30,7 @@ class neural_net {
         // boolean for storing if the user wants all the variables of the net to be printed out in a format so that when run it replicates this net (for exporting the net)
         bool printnet;
 
-        unsigned long iteration = 0;
+        unsigned int iteration = 0;
         double coef;
 
         // recursive method for changing the previous activation
@@ -186,7 +186,7 @@ class neural_net {
                     }
                 }
             }
-            neural_net::iteration++;
+            if (iteration == 0) neural_net::iteration++;
         }
 
         double calc_cost (node * wanted){ // calculates how bad the net performes compared to the wanted output, the higher the return value, the worse the net performs
