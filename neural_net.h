@@ -66,7 +66,7 @@ class neural_net {
         neuron * outn;
 
         //constructor
-        neural_net (unsigned int collums, unsigned int rows, unsigned int outputs, unsigned int inputs, bool printnet_after_death = false, double coef = .1){
+        neural_net (unsigned int collums, unsigned int rows, unsigned int outputs, unsigned int inputs, bool printnet_after_death = false, bool print_function_after_death = false, double coef = .1){
             if (collums == 0 || rows == 0 || outputs == 0 || inputs == 0){
                 throw std::runtime_error("Invalid parameter, the parameters must be greater than zero.");
             } else {

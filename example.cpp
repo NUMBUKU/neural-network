@@ -22,7 +22,7 @@ void testcases (int c){ // defines the test cases with known input and output va
 
 int main (){
     // definess a new neural net
-    net::neural_net neurnet0(1/*the number of cullumns of neurons in the net (excluding inputs and outputs)*/, 1/*number of rows of neurons in the net (excluding inputs and outputs)*/, 2/*number of output neurons (and thus number of outputs)*/, 1/*number of input neurons (and thus number of inputs)*/, false/*optional, when set to true the values of the net are printed so you can export the net*/, .1/*optional, sets the coeffincients of the activation functions that have coefficients*/);
+    net::neural_net neurnet0(1/*the number of cullumns of neurons in the net (excluding inputs and outputs)*/, 1/*number of rows of neurons in the net (excluding inputs and outputs)*/, 2/*number of output neurons (and thus number of outputs)*/, 1/*number of input neurons (and thus number of inputs)*/, false/*optional, when set to true the values of the net are printed so you can export the net*/, false/*optional, when set to true the net is printed as a function after death so you can export the net*/, .1/*optional, sets the coeffincients of the activation functions that have coefficients*/);
     
     // initialises the input and wanted lists
     input = newList();
