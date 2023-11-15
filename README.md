@@ -21,6 +21,6 @@ improve the net's performance use:
 "'the name of your net'.improve(the list of the wanted outputs, how much it is allowed to change the parameters);"
 The namespace is "net::neural_net::".
 
-To include the file have it in the same folder and type: '# include "neural_net.h"'.
+To include the file have it in the same folder and type: '# include "neural_net.cpp"'.
 
 That's it, I hope you learn something.

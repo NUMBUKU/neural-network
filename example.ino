@@ -1,4 +1,4 @@
-# include "neural_net.h"
+# include "neural_net.cpp"
 
 node * input; // the two lists
 node * wanted;
@@ -59,6 +59,11 @@ void setup (){
     //     neurnet0.improve(wanted, learningrate);
     //     learningrate -= .1; // reducing the learning rate
     // }
+
+    // after training we can input other inputs than just the testcase inputs
+
+    delete (input); // deleting the pointers
+    delete (wanted);
 }
 
 void loop (){}

@@ -24,11 +24,12 @@
 # include "neuron.h"
 
 namespace net {
+using std::runtime_error;
 
 class neural_net {
     private:
         // boolean for storing if the user wants all the variables of the net to be printed out in a format so that when run it replicates this net (for exporting the net)
-        bool printnet;
+        bool printnet, function;
 
         unsigned int iteration = 0;
         double coef;
@@ -53,6 +54,10 @@ class neural_net {
             }
 
             return;
+        }
+
+        void printfunction(){
+
         }
     public:
         // public variables for the output of the net
@@ -79,6 +84,7 @@ class neural_net {
                 neural_net::outn = new neuron [outputs];
                 neural_net::middle = new node * [neural_net::col];
                 neural_net::printnet = printnet_after_death;
+                neural_net::function = print_function_after_death;
                 for (int i = 0; i < neural_net::col; i++){ // assigning values for weights and biasses
                     neural_net::middle[i] = newList();
                     for (int j = 0; j < neural_net::rows; j++){
@@ -127,6 +133,25 @@ class neural_net {
                         std::cout << "changeAtIndex(name.outn[" << i << "].wgt, " << c << ", " << atIndex(neural_net::outn[i].wgt, c) << ");" << std::endl;
                     }
                 }
+            } else if (neural_net::function){
+                std::cout << "double middlelayer(double in){}" << std::endl;
+                std::cout << "double outlayer(double in){}" << std::endl;
+                std::cout << "double outl[" << outputs << "];" << std::endl;
+                std::cout << "void net (";
+                std::cout << "input0";
+                for (int in = 1; in < neural_net::inputs; in++){
+                    std::cout << ", ";
+                    std::cout << "input"; std::cout << in;
+                }
+                std::cout << "){ ";
+                for (int i = 0; i < neural_net::outputs; i++){
+                    std::cout << "outl[" << i << "] = outlayer(";
+                    for (int x = 0; x < neural_net::col; x++){
+                        for (int y = 0; y < neural_net::rows; y++){
+                            std::cout << "middlelayer(";
+                        }
+                    }
+                }
             } else {
                 for (int x = 0; x < neural_net::col; x++){            
                     for (int y = 0; y < neural_net::rows; y++){
@@ -172,7 +197,6 @@ class neural_net {
                         }
                     }
 
-                    neural_net::out = indexOf(neural_net::outl, max(neural_net::outl));
                     neural_net::certainty = round((atIndex(neural_net::outl, neural_net::out) / total(neural_net::outl)) * atIndex(neural_net::outl, neural_net::out) * 1000)/10;
                     return neural_net::out;
                 } else { // middle layers
@@ -223,4 +247,26 @@ class neural_net {
             return;
         }
 };
+
+extern "C" {
+    neural_net* net_new(unsigned int collums, unsigned int rows, unsigned int outputs, unsigned int inputs, bool printnet_after_death = false, bool print_function_after_death = false, double coef = .1){
+        return new neural_net(collums, rows, outputs, inputs, printnet_after_death, print_function_after_death, coef);
+    }
+
+    double net_calc_out(neural_net * neur, node * input){return neur->calc_out(input);}
+    double net_calc_cost(neural_net * neur, node * wanted){return neur->calc_cost(wanted);}
+    void net_improve(neural_net * neur, node * wanted, double money){neur->improve(wanted, money);}
+    void net_delete(neural_net * neur){delete(neur);}
+    
+    double net_certainty(neural_net * neur){return neur->certainty;}
+    double net_out(neural_net * neur){return neur->certainty;}
+    node * net_outl(neural_net * neur){return neur->outl;}
+
+    node * list_new(){return newList();}
+    void changeIndex(node * head, int index, double data){changeAtIndex(head, index, data);};
+    double index(node * head, int index){return atIndex(head, index);}
+    int length(node * head){return len(head);}
+    void remove(node * in){delete(in);}
+}
+
 }
