@@ -1,7 +1,7 @@
 # line 2 to line 44 are for importing the neural net library using ctypes
 from ctypes import cdll
 
-lib = cdll.LoadLibrary('C:\\Users\\OE104296\\OneDrive - Libreon\\Documenten\\GitHub\\neural-network\\libnet.so')
+lib = cdll.LoadLibrary('libnet.so')
 
 class neural_net(object):
     certainty = 0
