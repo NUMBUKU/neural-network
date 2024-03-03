@@ -50,6 +50,7 @@ int main (){
     cout << "cost after (should be lower): " << neurnet0.calc_cost(wanted) << endl;
 
     // example of training the neural net
+    
     // double learningrate = 1;
     // for (int i = 0; i < 100; i++){
     //     testcases(i % 2); // oscillates between the testcases

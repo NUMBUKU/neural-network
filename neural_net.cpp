@@ -88,9 +88,8 @@ class neural_net {
                 for (int i = 0; i < neural_net::col; i++){ // assigning values for weights and biasses
                     neural_net::middle[i] = newList();
                     for (int j = 0; j < neural_net::rows; j++){
-                        neural_net::net[i, j].wgt = newList();
                         if (i == 0){
-                            for (int k = 0; k < neural_net::inputs; k++){
+                            for (int k = 0; k < neural_net::inputs; k++){ // layer after input layer
                                 app(neural_net::net[i, j].wgt, 1);
                             }
                         } else {
@@ -98,12 +97,9 @@ class neural_net {
                                 app(neural_net::net[i, j].wgt, 1);
                             }
                         }
-                        neural_net::net[i, j].bias = 0;
-                        outn[j].out = 0;
                     }
                 }
 
-                neural_net::middle[neural_net::col-1] = newList();
                 for (int l = 0; l < neural_net::outputs; l++){
                     neural_net::outn[l].wgt = newList();
                     for (int m = 0; m < neural_net::rows; m++){
@@ -163,10 +159,10 @@ class neural_net {
             for (int n = 0; n < neural_net::col; n++){
                 delete (middle[n]);
             }
-            delete (neural_net::outl);
-            delete (neural_net::middle);
-            delete (neural_net::net);
-            delete (neural_net::outn);
+            delete neural_net::outl;
+            delete [] neural_net::middle;
+            delete [] neural_net::net;
+            delete [] neural_net::outn;
         }
 
 
@@ -196,7 +192,8 @@ class neural_net {
                             changeAtIndex(neural_net::outl, j, neural_net::outn[j].act);
                         }
                     }
-
+                    
+                    neural_net::out = indexOf(outl, max(outl));
                     neural_net::certainty = round((atIndex(neural_net::outl, neural_net::out) / total(neural_net::outl)) * atIndex(neural_net::outl, neural_net::out) * 1000)/10;
                     return neural_net::out;
                 } else { // middle layers
@@ -211,6 +208,7 @@ class neural_net {
                 }
             }
             if (iteration == 0) neural_net::iteration++;
+            return -1;
         }
 
         double calc_cost (node * wanted){ // calculates how bad the net performes compared to the wanted output, the higher the return value, the worse the net performs

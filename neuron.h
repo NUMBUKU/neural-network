@@ -4,36 +4,24 @@
 const char error[65] = "The two input lists should be the same size when they are not.\n"; // defines the constant error mesage
 
 typedef struct n_t { // defines a neuron
-    node * wgt;
-    double bias;
-    double act;
-    int out;
+    node * wgt = newList();
+    double bias = 0;
+    double act = 0;
+    int out = 0;
 } neuron;
 
 // some activation functions
 
 double hyptan (double in, int der){ // scaling function from -1 to 1
-    if (der == 1){
-        return 1/(pow(cosh(in), 2.00));
-    } else {
-        return tanh(in);
-    }
+    return der == 1 ? 1/(pow(cosh(in), 2.00)) : tanh(in);
 }
 
 double normhyptan (double in, int der){ // scaling function from 0 to 1
-    if (der == 1){
-        return 1/(pow(cosh(in), 2.00));
-    } else {
-        return (tanh(in)+1)/2;
-    }
+    return der == 1 ? 1/(2 * pow(cosh(in), 2.00)) : (tanh(in)+1)/2;
 }
 
 double sigmoid (double in, int der){ // scaling function from 0 to 1
-    if (der == 1){
-        return (exp(in))/(pow((1+exp(in)), 2.00));
-    } else {
-        return 1/(1 + exp(-1*in));
-    }    
+    return der == 1 ? (exp(in))/(pow((1+exp(in)), 2.00)) : 1/(1 + exp(-1*in));
 }
 
 double ReLU (double in, int der){
@@ -44,6 +32,7 @@ double ReLU (double in, int der){
         if (in <= 0) return 0;
         if (in > 0) return in;
     }
+    return 0;
 }
 
 double LeakyReLU (double in, double a, int der){
@@ -57,6 +46,7 @@ double LeakyReLU (double in, double a, int der){
         if (in <= 0) return in * a;
         if (in > 0) return in;
     }
+    return 0;
 }
 
 double SiLU (double in, int der){
@@ -64,7 +54,8 @@ double SiLU (double in, int der){
         return in * sigmoid(in, 1) + sigmoid(in, 0);
     } else {
         return in * sigmoid(in, 0);
-    }     
+    }
+    return 0;
 }
 
 double ELU (double in, double a, int der){
@@ -78,6 +69,7 @@ double ELU (double in, double a, int der){
         if (in <= 0) return a * (exp(in) - 1);
         if (in > 0) return in;
     }
+    return 0;
 }
 
 double middlelayer (double in, double a){
@@ -89,11 +81,7 @@ double outlayer (double in, double a){
 }
 
 double derivative (double in, int output, double a = .1){ // derivitives of the scaling functions
-    if (output) {
-        return normhyptan(in, 1);
-    } else {
-        return LeakyReLU(in, a, 1);
-    }
+    return output ? normhyptan(in, 1) : LeakyReLU(in, a, 1);
 }
 
 double calc_z (node * act, node * wgt, double bias){ // calculates what the output of one neuron should be without scaling
@@ -115,9 +103,7 @@ double calc_act (node * act, node * wgt, double bias, int output, double a){ // 
         printf(error);
         return NAN;
     }
-
-    if (!output) return middlelayer(calc_z(act, wgt, bias), a);
-    if (output) return outlayer(calc_z(act, wgt, bias), a);
+    return output ? outlayer(calc_z(act, wgt, bias), a) : middlelayer(calc_z(act, wgt, bias), a);
 }
 
 double cost (double wanted, double given){ // calculates how bad the machine performes    

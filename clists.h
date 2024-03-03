@@ -23,6 +23,7 @@ typedef struct node_t { // defines an element
     struct node_t * next;
 } node;
 
+
 node * newList (){ // returns a head which points to a list with a small garbage value in it
     node * a = NULL;
     a = (node *)malloc(sizeof(node));
@@ -41,26 +42,21 @@ int len(node * head){ // returns the length of the list
         i++;
         current = current->next;
     }
-    //delete (current);
     return i;
 }
 
 node * clear(node * head){ // clears the list and makes it empty again
-    //delete (head);
     return newList();
 }
 
 void printlist(node * head){ // prints the entire list
     node * current = head;
-    if (current->data == 1.7E-308){
-        return;
-    }
+    if (current->data == 1.7E-308) return;
 
     for (int i = 0; i < len(head); i++) {
         printf("%lf\n", current->data);
         current = current->next;
     }
-    //delete (current);
     return;
 }
 
@@ -116,7 +112,6 @@ void extend(node * head, node * head1){ // extends the list by adding another li
         }
         current->next = head1;
     }
-    //delete (current);
     return;
 }
 
@@ -130,22 +125,15 @@ node * prp(node * head, double data){ // prepends a value to the beginning of th
 
 void pop(node * head){ // removes the value at the end of the list
     node * current = head;
-    node * previous;
     if (len(head) == 1){
-        current->data = 1.7E-308;
-        //delete (current->next);
-        current->next = NULL;
+        current = newList();
         return;
-    }
-    if (current->data != 1.7E-308){
-        while (current->next != NULL) {
-            previous = current;
+    } else {
+        while (current->next->next != NULL) {
             current = current->next;
         }
-        previous->next = NULL;
+        current->next = NULL;
     }
-    //delete (current);
-    //delete (previous);
     return;
 }
 
@@ -153,7 +141,10 @@ node * shift(node * head){ // removes the value at the beginning of the list and
     if (len(head) == 1){
         return newList();
     }
-    return head->next;
+    node * del = head;
+    head = head->next;
+    delete del;
+    return head;
 }
 
 node * copy(node * head){ // returns a copy of the original list, without pointing to the same thing
